@@ -1,0 +1,60 @@
+Daily Ledger: installable app with sync
+
+PART 1: PUT THE APP ONLINE (free)
+1. Go to app.netlify.com/drop and drag this whole folder onto the page. You get a https link.
+   (GitHub Pages also works.)
+2. Open the link on your phone and install it:
+   - Android (Chrome): menu > Install app
+   - iPhone (Safari): Share > Add to Home Screen
+   Do the same on your computer if you like (Chrome/Edge: install icon in the address bar).
+
+PART 2: TURN ON SYNC (Supabase, free)
+1. Create a project at supabase.com (any name, choose a region near you).
+2. Open SQL Editor > New query, paste everything from supabase-setup.sql, press Run.
+3. Open Authentication > Sign In / Providers > Email, and turn OFF "Confirm email"
+   (simplest for a personal app). If you leave it on, you must click the link in the
+   email Supabase sends before you can sign in.
+4. Open Project Settings > API. Copy the Project URL and the anon public key.
+5. In the app: Settings > Sync across devices. Paste the URL and key, press Save.
+   Type your email and a password, press Create account.
+6. On every other device, open the app, go to Settings > Sync across devices,
+   paste the same URL and key, and press Sign in with the same email and password.
+
+Optional shortcut: open index.html in a text editor, find
+   var SB_URL='',SB_KEY='';
+and put your URL and key between the quotes. Then you never have to type them on a device.
+(The anon key is meant to be public. Your data is protected by the sign-in and the
+row security rules in the SQL file, so each person only sees their own entries.)
+
+HOW SYNC WORKS
+- Entries always save on the device first, so the app works offline.
+- Changes upload a moment after you make them, and every 45 seconds the app checks for
+  changes from your other devices. Settings > Sync across devices > Sync now forces a check.
+- If you change the same entry on two devices, the most recent change wins.
+- Sign out stops syncing but keeps the entries on that device.
+- Use Settings > Back up now now and then as well.
+
+UPDATING THE APP LATER
+Replace index.html, and change VERSION in sw.js (for example ledger-v3) so phones pick up the new copy.
+
+
+PART 3: LAUNCH TO OTHER PEOPLE
+1. In index.html set  var SB_URL='...',SB_KEY='...';  to your project URL and anon key.
+   Users then only sign up / sign in, they never see these fields.
+2. Re-run supabase-setup.sql (safe to run again). It now includes delete_my_account(),
+   which powers Settings > Sync > Delete my account.
+3. Supabase > Authentication > Sign In / Providers > Email: turn ON "Confirm email".
+4. Supabase > Authentication > URL Configuration: set Site URL to your app link, and add the
+   same link under Redirect URLs. Without this, reset and confirmation links will not work.
+5. Supabase's built-in email sender is limited to a few emails per hour. Before sharing widely,
+   add your own SMTP under Authentication > Emails > SMTP Settings (Resend, Brevo, etc).
+6. Edit privacy.html: fill in every [BRACKET] (your name, email, date, providers).
+7. Upload the whole folder again. Change VERSION in sw.js each time you update.
+8. Test: create an account with a second email, confirm it, reset its password, then delete it.
+
+GOOD TO KNOW
+- Free Supabase projects pause after about a week with no activity (data is kept, you can
+  resume it in the dashboard). Upgrade if real users depend on it.
+- You can technically read users' data in the Supabase dashboard. Say so honestly (the
+  privacy template does) and avoid looking.
+- Entries are not end-to-end encrypted.
